@@ -77,3 +77,6 @@ void fadeToColor(CRGB targetColor) {
   }
   FastLED.show();
 }
+
+
+// Must press reset button after every test
