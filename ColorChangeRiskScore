@@ -1,0 +1,94 @@
+
+#include <FastLED.h>
+
+#define NUM_LEDS 6   // Number of LEDs in your strip
+#define DATA_PIN 6   // Digital pin of your Arduino
+
+CRGB leds[NUM_LEDS];
+
+bool defaultMode = true; // Flag to indicate the default mode
+CRGB targetColor = CRGB::White; // Variable to store the chosen color
+
+void setup() {
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+  Serial.begin(9600);  // Start the Serial communication
+  setColor(targetColor); // Set initial color to white
+}
+
+
+// Function to set the LED strip color
+void setColor(CRGB targetColor) {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = targetColor;
+  }
+  FastLED.show();
+}
+
+// Function to fade to the specified color
+void fadeToColor(CRGB targetColor) {
+  // Gradually fade the current color to the target color
+  for (int i = 0; i < 256; i++) {
+    CRGB currentColor = CRGB::Black;
+    currentColor.nscale8(i);
+    
+    for (int j = 0; j < NUM_LEDS; j++) {
+      leds[j] = blend(currentColor, targetColor, 128);
+    }
+    
+    FastLED.show();
+    delay(10);
+  }
+
+  // Gradually fade the target color to black
+  for (int i = 255; i >= 0; i--) {
+    CRGB currentColor = targetColor;
+    currentColor.nscale8(i);
+    
+    for (int j = 0; j < NUM_LEDS; j++) {
+      leds[j] = blend(currentColor, targetColor, 128);
+    }
+    
+    FastLED.show();
+    delay(1);
+  }
+}
+
+
+
+void loop() {
+  if (Serial.available() > 0) {
+    int input = Serial.parseInt(); // Read the serial input as an integer
+    Serial.print("Received input: ");
+    Serial.println(input);
+
+    // Set the LED color based on the input value
+    if (input >= 0 && input <= 10) {
+      targetColor = CRGB::Green;
+      Serial.println("Color changed to Green");
+    } else if (input > 10 && input <= 20) {
+      targetColor = CRGB::Yellow;
+      Serial.println("Color changed to Yellow");
+    } else if (input > 20 && input <= 30) {
+      targetColor = CRGB::Red;
+      Serial.println("Color changed to Red");
+    } else if (input > 30 && input <= 40) {
+      targetColor = CRGB::Blue;
+      Serial.println("Color changed to Blue");
+    }
+
+    // Enter the non-default mode
+    defaultMode = false;
+    Serial.println("Switched to non-default mode");
+  }
+
+  setColor(targetColor);
+
+  // // Check if the Arduino is reset or powered off
+  // if (defaultMode) {
+  //   // Fade in and out with white light when in default mode
+  //   fadeToColor(CRGB::White);
+  // } else {
+  //   // Display the chosen color
+  //   setColor(targetColor);
+  // }
+}
