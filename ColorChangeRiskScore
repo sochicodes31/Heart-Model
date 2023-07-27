@@ -1,7 +1,7 @@
 
 #include <FastLED.h>
 
-#define NUM_LEDS 6   // Number of LEDs in your strip
+#define NUM_LEDS 8   // Number of LEDs in your strip
 #define DATA_PIN 6   // Digital pin of your Arduino
 
 CRGB leds[NUM_LEDS];
